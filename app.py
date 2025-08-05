@@ -3,10 +3,12 @@ import json
 import secrets
 import pymysql
 import openpyxl
+pymysql.install_as_MySQLdb()
 from io import BytesIO
 secrets.token_hex(16)
 
 from flask import Blueprint
+from flask_mysqldb import MySQL
 
 auth = Blueprint('auth', __name__)
 
