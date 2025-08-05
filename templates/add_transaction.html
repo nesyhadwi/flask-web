@@ -1,0 +1,131 @@
+{% extends 'base_kasir.html' %}
+{% block content %}
+<h2>Tambah Transaksi</h2>
+
+<form method="POST" id="formTransaksi" onsubmit="return validateForm()">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <div id="items">
+        <div class="item">
+            <select name="product_id[]" class="product-select" onchange="updatePrice(this)">
+                <option value="">Pilih Produk</option>
+                {% for product in products %}
+                    <option value="{{ product[0] }}" data-price="{{ product[2] }}">{{ product[1] }}</option>
+                {% endfor %}
+            </select>
+            <input type="number" name="quantity[]" class="quantity-input" placeholder="Jumlah" min="1" value="1" required oninput="updateSubtotal(this)">
+            <span class="subtotal">Subtotal: Rp0</span>
+        </div>
+    </div>
+
+    <button type="button" onclick="addItem()">Tambah Produk</button>
+    <hr>
+    <p><strong>Total: <span id="total">Rp0</span></strong></p>
+
+    <label>Uang Bayar: </label>
+    <input type="number" id="uangBayar" name="uang_bayar" placeholder="Masukkan nominal" required oninput="updateKembalian()">
+    
+    <p><strong>Kembalian: <span id="kembalian">Rp0</span></strong></p>
+
+    <button type="submit">Bayar</button>
+</form>
+
+<script>
+    function formatRupiah(number) {
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR'
+        }).format(number);
+    }
+
+    function updatePrice(selectElement) {
+        const container = selectElement.closest('.item');
+        updateSubtotal(container.querySelector('.quantity-input'));
+    }
+
+    function updateSubtotal(inputElement) {
+        const container = inputElement.closest('.item');
+        const select = container.querySelector('select');
+        const quantity = parseInt(inputElement.value) || 0;
+        const price = parseInt(select.options[select.selectedIndex].dataset.price) || 0;
+        const subtotal = quantity * price;
+
+        container.querySelector('.subtotal').textContent = 'Subtotal: ' + formatRupiah(subtotal);
+        updateTotal();
+    }
+
+    function updateTotal() {
+        const subtotals = document.querySelectorAll('.item');
+        let total = 0;
+
+        subtotals.forEach(item => {
+            const select = item.querySelector('select');
+            const quantity = parseInt(item.querySelector('.quantity-input').value) || 0;
+            const price = parseInt(select.options[select.selectedIndex].dataset.price) || 0;
+            total += quantity * price;
+        });
+
+        document.getElementById('total').textContent = formatRupiah(total);
+        updateKembalian();
+    }
+
+    function updateKembalian() {
+        const totalText = document.getElementById('total').textContent.replace(/[^0-9]/g, '');
+        const total = parseInt(totalText) || 0;
+        const bayar = parseInt(document.getElementById('uangBayar').value) || 0;
+        const kembalian = bayar - total;
+
+        document.getElementById('kembalian').textContent = formatRupiah(kembalian >= 0 ? kembalian : 0);
+    }
+
+    function addItem() {
+        const item = document.querySelector('.item');
+        const clone = item.cloneNode(true);
+        clone.querySelector('select').selectedIndex = 0;
+        clone.querySelector('input').value = 1;
+        clone.querySelector('.subtotal').textContent = 'Subtotal: Rp0';
+        document.getElementById('items').appendChild(clone);
+    }
+
+    let totalBelanja = 0;  // total disimpan di sini, bukan ambil dari innerText
+
+function updateTotal() {
+    const subtotals = document.querySelectorAll('.item');
+    totalBelanja = 0;
+
+    subtotals.forEach(item => {
+        const select = item.querySelector('select');
+        const quantity = parseInt(item.querySelector('.quantity-input').value) || 0;
+        const price = parseInt(select.options[select.selectedIndex].dataset.price) || 0;
+        totalBelanja += quantity * price;
+    });
+
+    document.getElementById('total').textContent = formatRupiah(totalBelanja);
+    updateKembalian();
+}
+
+function updateKembalian() {
+    const bayar = parseInt(document.getElementById('uangBayar').value) || 0;
+    const kembalian = bayar - totalBelanja;
+
+    document.getElementById('kembalian').textContent = formatRupiah(kembalian >= 0 ? kembalian : 0);
+}
+
+function validateForm() {
+    const bayar = parseInt(document.getElementById('uangBayar').value) || 0;
+
+    if (bayar < totalBelanja) {
+        alert('Uang yang dibayarkan kurang dari total belanja!');
+        return false; // prevent submit
+    }
+
+    const kembalian = bayar - totalBelanja;
+    alert('Transaksi berhasil!\nKembalian: ' + formatRupiah(kembalian));
+    return true; // allow submit
+}
+    // Update all on page load
+    document.querySelectorAll('.product-select').forEach(select => {
+        updatePrice(select);
+    });
+</script>
+{% endblock %}

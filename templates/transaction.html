@@ -1,0 +1,69 @@
+{% extends 'base_kasir.html' %}
+{% block content %}
+<div class="container mt-1">
+    <h3 class="mb-4">Riwayat Transaksi</h3>
+
+    <!-- Tombol Tambah Product -->
+    <div class="mb-3">
+        <a href="{{ url_for('add_transaction') }}" class="btn btn-success">Tambah Product</a>
+    </div>
+
+    <!-- Form Filter Rentang Waktu -->
+    <form method="GET" action="{{ url_for('riwayat_transaksi') }}" class="row g-3 align-items-end">
+        <div class="col-md-3">
+            <label for="start_date" class="form-label">Dari Tanggal:</label>
+            <input type="date" class="form-control" name="start_date" id="start_date" value="{{ request.args.get('start_date', '') }}">
+        </div>
+        <div class="col-md-3">
+            <label for="end_date" class="form-label">Sampai Tanggal:</label>
+            <input type="date" class="form-control" name="end_date" id="end_date" value="{{ request.args.get('end_date', '') }}">
+        </div>
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-primary w-100">Filter</button>
+        </div>
+        <div class="col-md-3">
+            <a href="{{ url_for('export_excel', start_date=request.args.get('start_date'), end_date=request.args.get('end_date')) }}" class="btn btn-outline-success w-100">
+                Export ke Excel
+            </a>
+        </div>
+    </form>
+
+    <!-- Tabel Riwayat Transaksi -->
+    <div class="table-responsive mt-4">
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Kode Unik</th>
+                    <th>Tanggal</th>
+                    <th>Barang yang Dibeli</th>
+                    <th>Jumlah</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for trx in transactions %}
+                    <tr>
+                        <td>{{ trx.unique_number }}</td>
+                        <td>{{ trx.tanggal }}</td>
+                        <td>
+                            <ul class="mb-0 ps-3">
+                                {% for item in trx['items'] %}
+                                    <li>{{ item.nama_produk }}</li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                        <td>
+                            <ul class="mb-0 ps-3">
+                                {% for item in trx['items'] %}
+                                    <li>{{ item.jumlah }}</li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                        <td><strong>Rp {{ "{:,.0f}".format(trx.total) }}</strong></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends 'base_kasir.html' %}
+{% block content %}
+<h2>{{ 'Edit product' if user else 'Tambah Product' }}</h2>
+<form method="POST">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <label>Code:</label><br>
+    <input type="number" name="product_code" value="{{ product[1] if product else '' }}"><br>
+    <label>Category:</label><br>
+    <input type="text" name="category" value="{{ product[2] if product else '' }}"><br>
+    <label>Product:</label><br>
+    <input type="text" name="name_product" value="{{ product[3] if product else '' }}"><br>
+    <label>Price:</label><br>
+    <input type="number" name="harga" value="{{ product[4] if product else '' }}"><br>
+    <label>Stock:</label><br>
+    <input type="number" name="stock" value="{{ product[5] if product else '' }}"><br>
+    <button type="submit">Simpan</button>
+</form>
+{% endblock %}

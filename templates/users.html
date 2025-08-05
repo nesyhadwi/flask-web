@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Data Users</h2>
+<a href="{{ url_for('create_user') }}">Tambah User</a>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<table border="1">
+    <tr>
+        <th>ID</th><th>Username</th><th>Password</th><th>Role</th><th>Aksi</th>
+    </tr>
+    {% for user in users %}
+    <tr>
+        <td>{{ user[0] }}</td>
+        <td>{{ user[1] }}</td>
+        <td>{{ user[2] }}</td>
+        <td>{{ user[3] }}</td>
+        <td>
+            <a href="{{ url_for('edit_user', id=user[0]) }}">Edit</a>
+            <form action="{{ url_for('delete_user', id=user[0]) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus user ini?')">
+    <button type="submit">Hapus</button>
+</form>
+
+
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

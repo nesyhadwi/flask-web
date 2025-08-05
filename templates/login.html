@@ -1,0 +1,19 @@
+{% block header %}
+  <h1>{% block title %}Log In{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+  <form method="post">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% if error %}
+      <p style="color:#433878">{{ error }}</p>
+    {% endif %}
+    <div class="form-group">
+    <label for="username">Username</label><br>
+    <input name="username" id="username" required><br>
+    <label for="password">Password</label><br>
+    <input type="password" name="password" id="password" required><br>
+    <input type="submit" value="Log In">
+    </div>
+  </form>
+{% endblock %}
